@@ -75,4 +75,15 @@ BUILD_KERNEL()
 	done
 }
 
-CLEAN_BUILD && SETUP_BUILD && BUILD_KERNEL && echo "Finished building $LOCALVERSION!"
+STRIP_MODULES()
+{
+	echo "Stripping kernel modules..."
+	mkdir "$KDIR/modules"
+	cd "$KDIR/modules"
+	find "$RDIR/build" -name "*.ko" -exec mv {} ./ \;
+	for module in ./*.ko; do
+		"${CROSS_COMPILE}strip" -g "$module"
+	done
+}
+
+CLEAN_BUILD && SETUP_BUILD && BUILD_KERNEL && STRIP_MODULES && echo "Finished building $LOCALVERSION!"
